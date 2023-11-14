@@ -1,23 +1,32 @@
 #!/usr/bin/node
-
+const id = process.argv[2];
+const url = 'https://swapi-api.alx-tools.com/api/films/' + id;
 const request = require('request');
-if (process.argv.length === 3) {
-  const filmId = process.argv[2];
-  const url = `https://swapi-api.alx-tools.com/api/films/${filmId}`;
 
-  request(url, { json: true }, async (err, _, { characters }) => {
-    if (err) throw err;
-
-    for (const char of characters) {
-      const getCharName = () => {
-        return new Promise((resolve, _reject) => {
-          request(char, { json: true }, function (err, _, { name }) {
-            if (err) throw err;
-            resolve(name);
-          });
-        });
-      };
-      console.log(await getCharName());
-    }
+function retrive (urlChar) {
+  return new Promise(function (resolve, reject) {
+    request(urlChar, function getChar (err2, response2, body2) {
+      if (err2) {
+        reject(err2);
+      } else {
+        resolve(JSON.parse(body2).name);
+      }
+    });
   });
 }
+
+async function getlist (urlist) {
+  for (const urlChar of urlist) {
+    const character = await retrive(urlChar);
+    console.log(character);
+  }
+}
+
+request(url, function getList (err, response, body) {
+  if (err) {
+    throw err;
+  } else {
+    const urlist = JSON.parse(body).characters;
+    getlist(urlist);
+  }
+});
